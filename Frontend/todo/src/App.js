@@ -10,19 +10,26 @@ function App() {
   const [editingTodo, setEditingTodo] = useState(null);
   const [notification, setNotification] = useState({ message: '', type: '' });
 
+  
   useEffect(() => {
+    const fetchTodos = async () => {
+      try {
+        const response = await todoService.getAllTodos();
+        setTodos(response.data);
+      } catch (error) {
+        console.error('Error fetching todos:', error);
+        setNotification({
+          message: 'Error fetching todos.',
+          type: 'error'
+        });
+      }
+    };
+
     fetchTodos();
   }, []);
 
-  const fetchTodos = async () => {
-    try {
-      const response = await todoService.getAllTodos();
-      setTodos(response.data);
-    } catch (error) {
-      console.error('Error fetching todos:', error);
-      showNotification('Error fetching todos.', 'error');
-    }
-  };
+
+  
 
   const addTodo = async (todo) => {
     try {
