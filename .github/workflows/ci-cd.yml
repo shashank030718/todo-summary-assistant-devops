@@ -85,7 +85,7 @@ jobs:
               "set -e",
               "sudo -u ec2-user git -C /home/ec2-user/todo-summary-assistant-devops pull --ff-only origin main",
               "cd /home/ec2-user/todo-summary-assistant-devops",
-              "sudo docker compose up -d --build",
+              "sudo docker compose up -d --build backend frontend",
               "sudo docker compose ps"
             ]' \
             --query 'Command.CommandId' \
