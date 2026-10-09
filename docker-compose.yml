@@ -27,8 +27,8 @@ services:
       SPRING_DATASOURCE_URL: jdbc:mysql://db:3306/todo_db
       SPRING_DATASOURCE_USERNAME: todoapp
       SPRING_DATASOURCE_PASSWORD: ${MYSQL_PASSWORD:?Set MYSQL_PASSWORD in your .env file}
-      COHERE_API_KEY: ${COHERE_API_KEY:-YOUR_COHERE_API_KEY}
-      SLACK_WEBHOOK_URL: ${SLACK_WEBHOOK_URL:-YOUR_WEBHOOK_URL}
+      COHERE_API_KEY: ${COHERE_API_KEY:-}
+      SLACK_WEBHOOK_URL: ${SLACK_WEBHOOK_URL:-}
       CORS_ALLOWED_ORIGINS: http://localhost:3000
     depends_on:
       db:
@@ -49,8 +49,24 @@ services:
     networks:
       - todo-network
 
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: todo-prometheus
+    restart: unless-stopped
+    volumes:
+      - ./monitoring:/etc/prometheus:ro
+      - prometheus-data:/prometheus
+    command:
+      - "--config.file=/etc/prometheus/prometheus.yml"
+      - "--storage.tsdb.path=/prometheus"
+    depends_on:
+      - backend
+    networks:
+      - todo-network
+
 volumes:
   mysql_data:
+  prometheus-data:
 
 networks:
   todo-network:

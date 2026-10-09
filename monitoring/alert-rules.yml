@@ -1,0 +1,26 @@
+groups:
+  - name: todo-application-alerts
+    rules:
+      - alert: TodoBackendDown
+        expr: up{job="todo-backend"} == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Todo backend is down"
+          description: "Prometheus cannot scrape the Todo backend for more than 1 minute."
+
+      - alert: TodoBackendHighLatency
+        expr: >
+          histogram_quantile(
+            0.95,
+            sum by (le) (
+              rate(http_server_requests_seconds_bucket{job="todo-backend"}[5m])
+            )
+          ) > 1
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Todo backend has high latency"
+          description: "The backend 95th-percentile HTTP request latency is above 1 second for 5 minutes."
