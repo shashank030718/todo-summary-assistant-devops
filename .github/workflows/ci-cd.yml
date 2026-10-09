@@ -1,0 +1,51 @@
+
+name: Todo Summary Assistant CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  backend-build:
+    name: Build Spring Boot Backend
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: maven
+
+      - name: Build backend
+        working-directory: Backend/todo-summary-assistant
+        run: chmod +x mvnw && ./mvnw -B package -DskipTests
+
+  frontend-build:
+    name: Build React Frontend
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: Frontend/todo/package-lock.json
+
+      - name: Install dependencies
+        working-directory: Frontend/todo
+        run: npm ci
+
+      - name: Build frontend
+        working-directory: Frontend/todo
+        run: npm run build
